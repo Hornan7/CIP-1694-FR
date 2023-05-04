@@ -33,7 +33,7 @@ Nous proposons une révision du système de gouvernance on-chain de Cardano pour
 La prise en charge de gouvernance spécialisée existante pour les mises à jour des paramètres de protocole et les certificats MIR sera supprimée,
 et deux nouveaux champs seront ajoutés aux corps de transaction normaux pour:
 
-1. Mesures de gouvernance
+1. Actions de gouvernance
 2. Votes
 
 **Tout utilisateur Cardano** sera autorisé à soumettre une **action de gouvernance**.
@@ -43,7 +43,7 @@ Nous introduisons également trois organes de gouvernance distincts qui ont des 
 2. un groupe de représentants délégués (ci-après dénommé **DReps**)
 3. les opérateurs de pool de participation (ci-après appelés **SPO**)
 
-Chaque mesure de gouvernance doit être ratifiée par deux de ces trois organes de gouvernance en utilisant leurs **votes** en chaîne.
+Chaque mesure de gouvernance doit être ratifiée par au moins deux de ces trois organes de gouvernance en utilisant leurs **votes** en chaîne.
 Le type d’action et l’état du système de gouvernance déterminent quels organes doivent le ratifier.
 
 Les actions ratifiées sont ensuite **promulguées** sur la chaîne, suivant un ensemble de règles bien définies.
@@ -296,20 +296,27 @@ peut également varier en fonction de la mesure de gouvernance.
 Cela donne beaucoup de flexibilité à la composition du comité.
 En particulier, il est possible d’élire un comité vide si la communauté souhaite supprimer entièrement le comité constitutionnel. Notez que cela est différent d’un état de non-confiance et constitue toujours un système de gouvernance capable de mettre en oeuvre des propositions.
 
+Il y aura un nouveau paramètre du protocole pour la taille minimale du comité,
+lui-même un nombre non négatif.
+
 #### Limites de mandat
 
-Chaque comité constitutionnel nouvellement élu aura une limite de mandat.
-Le système entrera automatiquement dans un état de non-confiance lorsque la limite de mandat du comité
-constitutionnel expire. Cette limite est un paramètre de protocole de gouvernance, qui spécifie le nombre maximal d’époques
-au cours de laquelle le comité peut ratifier les mesures de gouvernance. À l’expiration de la limite du mandat des comités, toute la gouvernance
-Les actions seront **abandonnées** et le protocole entrera dans un état de non-confiance.
-Cela signifie que le comité devrait planifier son propre remplacement s’il souhaite éviter les perturbations.
+Chaque comité constitutionnel nouvellement élu aura des limites de mandat par membre.
+Les limites par membre permettent un système de rotation, comme un tiers du comité
+expirant chaque année.
+Les membres expirés ne peuvent plus voter.
+Le membre peut également volontairement démissionner plus tôt, ce qui sera marqué sur la chaîne comme un membre expiré.
 
-La limite de mandat sera réinitialisée chaque fois que la mesure de gouvernance « Nouveau comité constitutionnel et/ou seuil » sera adoptée, même si le même comité est réélu.
-et le seuil reste inchangé. Cela permet aux détenteurs d’Ada de confirmer leur confiance dans le comité s’ils le souhaitent.
-Notez que la limite de mandat est calculée au moment où le comité est élu. Toute modification du protocole sous-jacent
-affecte uniquement le terme qui s’applique aux futurs comités et ne modifie pas le mandat du comité actuel.
+Le système entrera automatiquement dans un état de non-confiance lorsque le nombre de membres du comité
+non expirés tombe en dessous de la taille minimale du comité.
+Par exemple, un comité de taille cinq avec un quorum de trois et deux membres expirés peut encore
+passer des actions de gouvernance si tous les membres non expirés votent `Oui`.
+Cependant, si un autre membre expire, le système entre dans un état de non-confiance,
+puisque les deux membres restants ne suffisent pas pour atteindre le quorum.
 
+La limite de durée maximale est un paramètre de protocole de gouvernance, spécifié sous la forme d'un nombre d'époques.
+Pendant un état de non-confiance, aucune action ne peut être ratifiée,
+le comité devrait donc prévoir son propre remplacement s'il souhaite éviter les perturbations.
 
 <!--------------------------- Comité constitutionnel ---------------------------->
 <!---------------------------           DReps          -------------------------->
@@ -350,7 +357,12 @@ qui voteront en leur nom. De plus, deux options DRep prédéfinies sont disponib
 
 
 > **Note**
-> Tout détenteur d’Ada peut enregistrer ses références de pieu en tant que DRep et se déléguer à lui-même s’il souhaite participer activement à
+> Les DReps prédéfinis ne votent pas à l'intérieur des transactions, leur comportement est pris en compte au niveau du protocole.
+> Le DRep `abstention` peut être choisi pour diverses raisons, y compris le désir de ne pas
+> participer au système de gouvernance.
+
+> **Note**
+> Tout détenteur d'Ada peut s'inscrire en tant que DRep et se déléguer s'il souhaite participer activement à
 > vote.
 
 #### DReps enregistrés
@@ -379,6 +391,7 @@ certificats de délégation de vote.
 Les certificats d’inscription DRep comprennent :
 
 * un ID DRep
+* un dépôt
 * une ancre
 
 Une **ancre** est une paire de :
@@ -405,6 +418,11 @@ Les certificats de délégation de vote comprennent :
 
 * l’ID DRep auquel la participation doit être déléguée
 * les informations d’identification de mise pour le délégant
+
+> **Note**
+>
+> La délégation DRep mappe toujours un justificatif d'identité de mise à un justificatif d'identité DRep.
+> Cela signifie qu'un DRep ne peut pas déléguer une mise de vote à un autre DRep.
 
 ##### Schémas d’autorisation de certificat
 
@@ -535,7 +553,7 @@ Le tableau suivant détaille les exigences de ratification pour chaque scénario
 | Type d’action de gouvernance                                                    | CC   | DReps    | SPOs     |
 | :---                                                                            | :--- | :---     | :---     |
 | 1. Motion de non-confiance                                                      | \-   | $P_1$    | $Q_1$    |
-| 2<sub>a</sub>. Nouveau comité/seuil (_état normal_)                             | ✓    | $P_{2a}$ | \-       |
+| 2<sub>a</sub>. Nouveau comité/seuil (_état normal_)                             | \-   | $P_{2a}$ | $Q_{2b}$ |
 | 2<sub>b</sub>. Nouveau comité/seuil (_état de non-confiance_)                   | \-   | $P_{2b}$ | $Q_{2b}$ |
 | 3. Mise à jour de la Constitution                                               | ✓    | $P_3$    | \-       |
 | 4. Initiation du hard fork                                                      | ✓    | $P_4$    | $Q_4$    |
@@ -700,6 +718,8 @@ Le **groupe de gouvernance** comprend tous les nouveaux paramètres de protocole
 * dépôt d’action de gouvernance ('govDeposit')
 * montant du dépôt DRep ('drepDeposit')
 * période d’activité DRep ('drepActivity')
+* taille minimale du comité constitutionnel
+* limite maximale du mandat (en époques) du comité constitutionnel
 
 <!-- À faire :
  - Décider des valeurs initiales des nouveaux paramètres de gouvernance
@@ -1053,9 +1073,16 @@ Deuxièmement, pendant la phase d’amorçage, un vote du comité constitutionne
 avec un vote SPO suffisant, est suffisant pour initier un hard fork.
 Aucune autre action n’est possible pendant la phase d’amorçage.
 
-La phase d’amorçage se termine lorsque **l’une ou l’autre** des situations suivantes se produit :
-1. une mise suffisante est déléguée aux DReps
-2. un nombre donné d’époques s’est écoulé (probablement plusieurs mois après le hard fork)
+La phase d'amorçage se termine lorsqu'un nombre donné d'époques s'est écoulé,
+comme spécifié dans le fichier de configuration de l'ère du prochain grand livre.
+Cela se produira probablement plusieurs mois après le hard fork.
+
+De plus, il y aura un comité constitutionnel intérimaire,
+également spécifié dans le fichier de configuration de l'ère du prochain grand livre,
+dont les limites de mandat expireront à la fin de la phase d'amorçage.
+Le calendrier de rotation du premier comité non-bootstrap pourrait être inclus dans la constitution elle-même.
+Notez toutefois que, puisque le comité constitutionnelle ne vote jamais sur de nouveaux comités,
+il ne peut pas réellement imposer la rotation.
 
 #### Mesure de sécurité finale, post-amorçage
 
