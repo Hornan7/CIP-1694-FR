@@ -275,13 +275,11 @@ Le comité constitutionnel utilisera une configuration de clé chaude et froide,
 
 #### Remplacement du comité constitutionnel
 
-Le comité constitutionnel peut être remplacé de deux manières:
-
-* Lorsqu’il est dans un état **normal** (c.-à-d. un état de **confiance**), le comité peut être remplacé par un
-une action de gouvernance spécifique (« Nouveau comité constitutionnel », décrit ci-dessous) qui nécessite l’approbation du **comité constitutionnel actuel** et du **DReps**.
-
-* En cas de **non-confiance**, le comité peut également être remplacé par la même action de gouvernance (action 2 ci-dessous),
-mais cela nécessite plutôt l’approbation des **SPO** et des **DReps**.
+Le comité constitutionnel peut être remplacé via une action de gouvernance spécifique
+("Nouveau comité constitutionnel", décrit ci-dessous) qui requiert l'approbation à la fois
+des **SPOs** et des **DReps**
+Le seuil de ratification peut être différent dépendamment de si la gouvernance est
+dans un état de confiance ou dans un état de non-confiance.
 
 Le nouveau comité constitutionnel pourrait, en principe, être identique ou partiellement chevaucher le comité sortant tant que l’action est dûment ratifiée.
 Cela pourrait se produire, par exemple, si les électeurs ont une confiance collective dans tout ou une partie du comité et souhaitent prolonger son mandat.
