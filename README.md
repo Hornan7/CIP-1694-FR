@@ -371,7 +371,12 @@ en plus de la délégation actuelle aux pools de participation pour la productio
 La délégation DRep imitera les mécanismes de délégation de mise existants (via des certificats on-chain).
 De même, l’enregistrement des DReps imitera les mécanismes existants d’enregistrement des mise.
 De plus, les DReps inscrits devront voter régulièrement pour être toujours considérés comme actifs.
+Plus précisément, si un DRep ne soumet aucun vote pour `drepActivity` - plusieurs époques, le DRep est considéré comme inactif,
+où `drepActivity` est un nouveau paramètre de protocole.
 Les DReps inactifs ne comptent plus dans la participation active des votes.
+La raison pour laquelle les DReps sont marqués comme inactifs est que les DReps qui cessent de participer mais qui ont encore
+la mise qui leur est déléguée ne laisse finalement pas le système dans un état où aucune action de
+gouvernance peut passer.
 
 Les DReps enregistrés sont identifiés par un justificatif d’identité qui peut être :
 
@@ -390,7 +395,8 @@ Les certificats d’inscription DRep comprennent :
 
 * un ID DRep
 * un dépôt
-* une ancre
+* un justificatif de participation (pour le retour du dépôt)
+* une ancre en option
 
 Une **ancre** est une paire de :
 
@@ -408,7 +414,11 @@ Les certificats de retraite DRep comprennent :
 
 * un ID DRep
 * le numéro d’époque après lequel le DRep prendra sa retraite
+* une ancre en option
 
+Notez qu'un DRep est mis à la retraite dès que la chaîne accepte un certificat de retraite,
+et le dépôt est restitué via l'équilibrage de transaction habituel
+(de la même manière que les dépôts d'enregistrement du justificatif de participation sont retournés).
 
 ##### Certificats de délégation de vote
 
@@ -416,6 +426,7 @@ Les certificats de délégation de vote comprennent :
 
 * l’ID DRep auquel la participation doit être déléguée
 * les informations d’identification de mise pour le délégant
+* une ancre en option
 
 > **Note**
 >
@@ -491,7 +502,7 @@ Par exemple, une motion de censure est adoptée.
 | Action                                                | Description |
 | :---                                                  | :--- |
 | 1. Motion de censure                                  | Une motion pour créer un _état de non-confiance_ au sein du comité constitutionnel actuel |
-| 2. Nouveau comité constitutionnel et/ou nouveau seuil | Modification des membres du comité constitutionnel et/ou de son seuil de signature |
+| 2. Nouveau comité constitutionnel et/ou nouveau seuil | Modification des membres du comité constitutionnel et/ou de son seuil de signature et/ou limites de mandat|
 | 3. Mises à jour de la Constitution                    | Une modification de la Constitution off-chain, enregistrée en tant que hachage on-chain du document texte |
 | 4. Hard-Fork[^2] Initiation                           | Déclenche une mise à niveau non rétrocompatible du réseau ; Nécessite une mise à niveau logicielle préalable |
 | 5. Modifications des paramètres du protocole          | Toute modification d’un ou de plusieurs paramètres de protocole pouvant être mis à jour, à l’exclusion des modifications apportées aux versions majeures du protocole (« hard forks ») |
@@ -560,10 +571,12 @@ Le tableau suivant détaille les exigences de ratification pour chaque scénario
 | 5<sub>c</sub>. Modifications des paramètres de protocole, groupe technique      | ✓    | $P_{5c}$ | \-       |
 | 5<sub>d</sub>. Modifications des paramètres de protocole, groupe de gouvernance | ✓    | $P_{5d}$ | \-       |
 | 6. Retrait du Trésor                                                            | ✓    | $P_6$    | \-       |
-| 7. Infos                                                                        | ✓    | $P_7$    | \-       |
+| 7. Infos                                                                        | ✓    | $100$    | $100$    |
 
 Chacun de ces seuils est un paramètre de gouvernance.
 Les seuils initiaux devraient être choisis par la communauté Cardano dans son ensemble.
+Les deux seuils de l'action Info sont définis à 100 % car le fixer plus bas
+entraînerait l'impossibilité de sonder au-dessus du seuil.
 
 > **Note**
 > Il peut être logique que certains ou tous les seuils s’adaptent en ce qui concerne le Lovelace qui est activement inscrit pour voter.
@@ -641,7 +654,7 @@ Chaque mesure de gouvernance comprendra les éléments suivants :
 
 * un montant de dépôt (enregistré puisque le montant du dépôt est un paramètre de protocole pouvant être mis à jour)
 * une adresse de récompense pour recevoir le dépôt lorsqu’il est remboursé
-* une ancre pour toutes les métadonnées nécessaires pour justifier l’action
+* une ancre en option pour toutes les métadonnées nécessaires pour justifier l’action
 * une valeur de condensé de hachage pour éviter les collisions avec des actions concurrentes du même type (comme décrit précédemment)
 
 <!-- TODO: Fournir une spécification CBOR dans l’annexe pour ces nouvelles entités sur la chaîne -->
@@ -651,7 +664,7 @@ De plus, chaque action comprendra certains éléments spécifiques à son type :
 | Type d’action de gouvernance                 | Données supplémentaires                                                  |
 | :--                                          | :--                                                                      |
 | 1. Motion de non-confiance                   | Aucune                                                                   |
-| 2. Nouveau comité/seuil                      | L’ensemble des résumés de hachage de clé de vérification et une fraction |
+| 2. Nouveau comité/seuil                      | L’ensemble des résumés de hachage de clé de vérification (membres à supprimer), une carte des résumés de hachage de clé de vérification aux numéros d'époque (nouveaux membres et leur limite de mandat) et une fraction (seuil de quorum) |
 | 3. Mise à jour de la Constitution            | Un condensé de hachage du document constitutionnel                       |
 | 4. Initiation du hard fork                   | La nouvelle version majeure du protocole                                 |
 | 5. Modifications des paramètres du protocole | Les paramètres modifiés                                                  |
@@ -737,7 +750,7 @@ Chaque transaction de vote comprend les éléments suivants :
 * un ID d’action de gouvernance
 * un rôle - membre du comité constitutionnel, DRep ou SPO
 * un témoin d’informations d’identification de gouvernance pour le rôle
-* un point d’ancrage (tel que défini ci-dessus) pour les renseignements pertinents au vote;
+* une ancre en option (tel que défini ci-dessus) pour les renseignements pertinents au vote;
 * un vote 'Oui'/'Non'/'Abstention'
 
 Pour les SPO et les DReps, le nombre de votes exprimés (que ce soit 'Oui', 'Non' ou 'Abstention') est proportionnel au Lovelace qui leur est déléguée au moment où
