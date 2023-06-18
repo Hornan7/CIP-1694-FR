@@ -417,7 +417,7 @@ Les certificats de retraite DRep comprennent :
 * une ancre en option
 
 Notez qu'un DRep est mis à la retraite dès que la chaîne accepte un certificat de retraite,
-et le dépôt est restitué via l'équilibrage de transaction habituel
+et le dépôt est restitué dans le cadre de la transaction qui soumet le certificat de retrait
 (de la même manière que les dépôts d'enregistrement du justificatif de participation sont retournés).
 
 ##### Certificats de délégation de vote
@@ -505,7 +505,7 @@ Par exemple, une motion de censure est adoptée.
 | 2. Nouveau comité constitutionnel et/ou nouveau seuil | Modification des membres du comité constitutionnel et/ou de son seuil de signature et/ou limites de mandat|
 | 3. Mises à jour de la Constitution                    | Une modification de la Constitution off-chain, enregistrée en tant que hachage on-chain du document texte |
 | 4. Hard-Fork[^2] Initiation                           | Déclenche une mise à niveau non rétrocompatible du réseau ; Nécessite une mise à niveau logicielle préalable |
-| 5. Modifications des paramètres du protocole          | Toute modification d’un ou de plusieurs paramètres de protocole pouvant être mis à jour, à l’exclusion des modifications apportées aux versions majeures du protocole (« hard forks ») |
+| 5. Modifications des paramètres du protocole          | Toute modification **d’un ou de plusieurs** paramètres de protocole pouvant être mis à jour, à l’exclusion des modifications apportées aux versions majeures du protocole (« hard forks ») |
 | 6. Retraits de trésorerie                             | Mouvements du trésor, sous-classés en petits, moyens ou grands retraits (en fonction du montant de Lovelace à retirer). Les seuils pour les retraits de trésorerie sont examinés ci-dessous. |
 | 7. Infos                                              | Action qui n’a aucun effet sur la chaîne, autre qu’un enregistrement sur la chaîne. |
 
@@ -519,6 +519,9 @@ Notez qu’une motion de non-confiance est une mesure extrême qui permet aux d�
 qui a été accordé à l’actuel Comité constitutionnel.
 toute mesure de gouvernance en suspens, y compris celles que le comité a ratifiées ou celles qui seraient adoptées à cette époque;
 sera abandonnée si la motion est adoptée.
+
+> **Note**
+> Une **seule** action de gouvernance peut contenir **plusieurs** mises à jour des paramètres de protocole. De nombreux paramètres sont interconnectés et peuvent nécessiter d'être déplacés en synchronisme.
 
 #### Ratification
 
@@ -689,8 +692,10 @@ composé du hachage de transaction qui l’a créé et de l’index dans le corp
 
 Nous avons regroupé les changements de paramètres de protocole par type,
 permettant de fixer différents seuils pour chaque groupe.
+
 Toutefois, nous ne limitons pas chaque action de gouvernance des paramètres de protocole à un seul groupe.
-Le seuil maximal de tous les groupes concernés s’appliquera à toute mesure de gouvernance donnée.
+Dans le cas où une action de gouvernance contient des mises à jour pour plusieurs paramètres de différents groupes,
+le seuil maximal de tous les groupes concernés s’appliquera à toute mesure de gouvernance donnée.
 
 Les groupes de paramètres _réseaux_, _économique_ et _technique_ collectent les paramètres de protocole existants qui ont été introduits pendant les ères Shelley, Alonzo et Babbage.
 De plus, nous introduisons un nouveau groupe _gouvernance_ qui est spécifique aux nouveaux paramètres de gouvernance qui seront introduits par le CIP-1694.
