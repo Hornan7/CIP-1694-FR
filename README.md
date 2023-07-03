@@ -1057,14 +1057,14 @@ Le processus de ratification finale sera probablement un mélange de diverses id
 
  Il traitera et enregistrera les actions de gouvernance et les votes.
 
-* La règle de transition 'NEWEPOCH' sera modifiée.
+* La règle de transition `NEWEPOCH` sera modifiée.
 * La sous-règle `MIR` sera supprimée.
 * Une nouvelle règle `RATIFIEZ` sera introduite pour mettre en scène les actions de gouvernance en vue de leur promulgation.
 
  Il ratifiera les mesures de gouvernance et les mettra en oeuvre en vue de leur promulgation à l’époque actuelle ou à l’époque suivante, selon le cas.
 
-* Une nouvelle règle de `PROMULGATION` sera appelée immédiatement après la règle « EPOCH ». Cette règle édictera des mesures de gouvernance qui ont déjà été ratifiées.
-* La règle 'EPOCH' n’appellera plus la sous-règle 'NEWPP' ni ne calculera si le quorum est atteint sur l’état PPUP.
+* Une nouvelle règle de `PROMULGATION` sera appelée immédiatement après la règle `EPOCH` . Cette règle édictera des mesures de gouvernance qui ont déjà été ratifiées.
+* La règle `EPOCH` n’appellera plus la sous-règle `NEWPP` ni ne calculera si le quorum est atteint sur l’état PPUP.
 
 #### Modifications apportées au protocole de requête d’état local
 
