@@ -1,14 +1,12 @@
-```yaml
 ---
 CIP : 1694
 Titre : Un premier pas vers une gouvernance décentralisée on-chain
-Revision : [b3e3508a](https://github.com/cardano-foundation/CIPs/commit/b3e3508a162e3f8a577dce92baa47a270208d3b9)
+Revision : b3e3508a
 Translators :
     - Mike Hornan <support@able-pool.io>
     - Alexandre Lafleur <alexandre.lafleur@stm.info>
 Language : fr
 ---
-```
 
 ## Résumé
 
