@@ -1,3 +1,4 @@
+```yaml
 ---
 CIP : 1694
 Titre : Un premier pas vers une gouvernance décentralisée on-chain
@@ -7,6 +8,7 @@ Translators :
     - Alexandre Lafleur <alexandre.lafleur@stm.info>
 Language : fr
 ---
+```
 
 ## Résumé
 
